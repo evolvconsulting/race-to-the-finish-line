@@ -2,16 +2,16 @@
 # Introduction
 It may be challenging to present larger volumes of history in a succinct way that easily makes a point for the user.  Example: continually processing tasks or other automated processes that you would like to review.  In a situation when you have hundreds or more iterations of these items, to keep the user’s attention the output must be quick, short, and to the point.  Rather than having one scroll through line over line over line to understand historical trends, it makes more sense to provide a quick window into the previous iterations.  Presenting the information summarized to high may also create challenges trying to understand idiosyncrasies or inter relations within the continuous executions.   
 
-This simple POC provide the ability to 
+This simple POC provides the ability to 
 1. Setup a quick database with some sample data
 2. Show what the base Streamlit data_editor widget can present the data
 3. Show how using emojis instead can improve the user experience
 
 # Setup
-1. Login to your snowflake account and run the 2 files in the setup/data folder
+1. Login to your snowflake account and run the 2 files in the setup/data folder.
    - item_hisotry.sql
    - emoji_content.sql
-2. Create a settings.env file in the setup folder to store local env settings for your env
+2. Create a settings.env file in the setup folder to store local env settings for your env so the app can log into your Snowflake account.
    - If you don't already have environment variables setup, add the following variables to this file and they will be established at runtime
      - emoji_env=local
      - emoji_snowflake_authenticator="externalbrowser if using SSO or None"
