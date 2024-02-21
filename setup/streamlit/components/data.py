@@ -17,17 +17,24 @@ def get_snow_session() -> Session:
     if os.getenv('emoji_env') == 'local':
         print('is not Snowflake')
 
+        # setup appropriate arguments depending on the options provided
+        ckwargs = {
+            'user':os.getenv('emoji_snowflake_user')
+            ,'account':os.getenv('emoji_snowflake_account') 
+            ,'role':os.getenv('emoji_snowflake_role')
+            ,'warehouse':os.getenv('emoji_snowflake_warehouse')            
+            ,'database':os.getenv('emoji_snowflake_database')
+            ,'schema':os.getenv('emoji_snowflake_schema')
+            }
+        
+        # add authenticator if setup to use SSO or use specified password
+        if os.getenv('emoji_snowflake_authenticator') == 'externalbrowser':
+            ckwargs['authenticator'] = os.getenv('emoji_snowflake_authenticator')
+        else:
+            ckwargs['password'] = os.getenv('emoji_snowflake_pwd')
+        
         # setup snowflake connector
-        conn = snowflake.connector.connect(
-                authenticator=(os.getenv('emoji_snowflake_authenticator')) # use for SSO connection
-                ,user=(os.getenv('emoji_snowflake_user'))
-                ,password=(os.getenv('emoji_snowflake_pwd')) 
-                ,account=(os.getenv('emoji_snowflake_account')) 
-                ,role=(os.getenv('emoji_snowflake_role'))
-                ,warehouse=(os.getenv('emoji_snowflake_warehouse'))              
-                ,database=(os.getenv('emoji_snowflake_database'))
-                ,schema=(os.getenv('emoji_snowflake_schema')) 
-                )
+        conn = snowflake.connector.connect(**ckwargs)
         
         # set the session object
         result = Session.builder.configs({"connection": conn}).create()
@@ -40,9 +47,13 @@ def get_snow_session() -> Session:
     return result
 
 def get_dataFromQuery(query) -> pd.DataFrame:
-    query_main_df = get_snow_session().sql(query)
-    pandas_main_df = query_main_df.to_pandas()
-    return pandas_main_df
+    try:
+        query_main_df = get_snow_session().sql(query)
+        pandas_main_df = query_main_df.to_pandas()
+        return pandas_main_df
+    except Exception as err:
+        st.error(f'''Error occurred while trying to connect to Snowflake:  {str(err)}''',icon='🚨')
+
 
 def get_progressHistory(historyLimit:int) -> str:
     return f'''
