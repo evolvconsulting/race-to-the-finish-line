@@ -25,12 +25,21 @@ emoji_group
 ,emoji_content
 from (
     values
-    ('Pattern Display','Failed',':x:')
-    ,('Pattern Display','Successful',':heavy_check_mark:')
-    ,('Pattern Display','Incomplete',':warning:')
-    ,('Stoplight Display','Failed',':large_red_square:')
-    ,('Stoplight Display','Successful',':large_green_square:')
-    ,('Stoplight Display','Incomplete',':large_yellow_square:')
+    ('Pattern','Failed',':x:')
+    ,('Pattern','Successful',':heavy_check_mark:')
+    ,('Pattern','Incomplete',':warning:')
+    ,('Stoplight','Failed',':large_red_square:')
+    ,('Stoplight','Successful',':large_green_square:')
+    ,('Stoplight','Incomplete',':large_yellow_square:')
+    ,('Weather','Failed',':lightning_cloud:')
+    ,('Weather','Successful',':sun_with_face:')
+    ,('Weather','Incomplete',':partly_sunny_rain:')
+    ,('Smiley Face','Failed',':face_with_symbols_on_mouth:')
+    ,('Smiley Face','Successful',':grinning:')
+    ,('Smiley Face','Incomplete',':fearful:')
+    ,('Moon Phase','Failed',':new_moon:')
+    ,('Moon Phase','Successful',':full_moon:')
+    ,('Moon Phase','Incomplete',':first_quarter_moon:')
 
 ) x (emoji_group,execution_status,emoji_content)
 ;

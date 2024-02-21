@@ -9,13 +9,13 @@ st.set_page_config(layout="wide", page_title='Historical Presentation')
 common.display_header(pageHeader='Using a Data-Driven Emoji Column')
 
 # output the display dataframes
-displayCols = st.columns([2,2,3])
+displayCols = st.columns([2,1,3])
 
 with displayCols[0]:
     #select which option to output  Pattern or Stoplight
     st.selectbox('What type of emoji do you want to use for Item History?'
         ,key='choose_emojiGroup'
-        ,options=['Pattern Display','Stoplight Display']
+        ,options=['Pattern','Stoplight','Weather', 'Smiley Face','Moon Phase']
         ,index=None
         ,help=f'Use this to select the type of emojis to use for Item History output.'
         )
