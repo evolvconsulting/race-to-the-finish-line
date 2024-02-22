@@ -15,7 +15,7 @@ with displayCols[0]:
     #select which option to output  Pattern or Stoplight
     st.selectbox('What type of emoji do you want to use for Item History?'
         ,key='choose_emojiGroup'
-        ,options=['Pattern','Stoplight','Weather', 'Smiley Face','Moon Phase']
+        ,options=['Stoplight','Weather', 'Smiley Face','Moon Phase','Pattern']
         ,index=None
         ,help=f'Use this to select the type of emojis to use for Item History output.'
         )
