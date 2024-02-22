@@ -3,6 +3,7 @@ import os
 import PIL.Image as image
 import numpy as np
 import plotly.express as px
+import components.data as data
 
 # display the image from the setup folder using plotly
 # see https://medium.com/evolv-consulting/evolving-streamlit-in-snowflake-f9a319fb95f7
@@ -45,3 +46,21 @@ def display_header(pageHeader:str,showDivider:bool=True) -> None:
         display_image()
 
     st.divider()
+
+def prepare_px_figure(pd_df,xaxis,xlabel,yaxis,ylabel,color=None,colorlabel=None) -> object:
+    if color is not None:
+        category_orders={color:sorted(pd_df[color].unique())
+                            ,xaxis:sorted(pd_df[xaxis].unique())}
+        labels={xaxis: xlabel, yaxis: ylabel, color: colorlabel} 
+    else:
+        category_orders={xaxis:sorted(pd_df[xaxis].unique())}
+        labels={xaxis: xlabel, yaxis: ylabel} 
+
+    return px.scatter(pd_df
+                    ,y=yaxis
+                    ,x=xaxis
+                    ,labels=labels
+                    ,color=color
+                    ,color_discrete_map=data.get_colorMap(color)
+                    ,category_orders=category_orders
+                    )

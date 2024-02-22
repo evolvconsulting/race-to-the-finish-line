@@ -91,6 +91,26 @@ def get_lineHistory(historyLimit:int) -> str:
         ;
         '''
 
+def get_graphHistory(historyLimit:int) -> str:
+    return f'''
+        with last_items as (
+            select 
+            ih.item_name
+            ,ih.execution_timestamp::date as execution_date
+            ,ih.execution_status
+            from item_poc.history.item_history ih
+            qualify (row_number() over(partition by item_name order by ih.execution_timestamp desc)) <= {historyLimit}
+        )
+        select 
+        lt.item_name
+        ,lt.execution_date
+        ,lt.execution_status
+        ,count(1) as item_count
+        from last_items lt
+        group by 1,2,3
+        ;
+        '''
+
 def get_emojiHistory(emojiGroup:str,historyLimit:int) -> str:
     return f'''
         with last_items as (
@@ -111,3 +131,22 @@ def get_emojiHistory(emojiGroup:str,historyLimit:int) -> str:
         order by lt.item_name
         ;
         '''
+def get_itemList(emojiGroup:str,historyLimit:int) -> str:
+    return f'''
+        select distinct
+        ih.item_name
+        from item_poc.history.item_history ih
+        ;
+        '''
+
+def get_colorMap(color=None):
+    #add exec status colors
+    colormap_df = pd.DataFrame({
+            'COLOR_GROUP': ['EXECUTION_STATUS','EXECUTION_STATUS','EXECUTION_STATUS']
+            ,'COLOR_SEGMENT': ['Failed','Successful','Incomplete']
+            ,'COLOR_VALUE': ['rgb(255,0,0)','rgb(0,128,0)','rgb(255,255,0)']
+            }) 
+    
+    results=colormap_df[colormap_df['COLOR_GROUP'] == color].set_index(['COLOR_SEGMENT'])[['COLOR_VALUE']].to_dict()['COLOR_VALUE']
+
+    return results

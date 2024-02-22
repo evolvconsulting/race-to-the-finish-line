@@ -76,6 +76,7 @@ i.item_name
     when item_name =  'Successful Trend Item' and r.date_number % 10 > 0 then 'Successful'
     when item_name =  'Successful Trend Item' and r.date_number % 10 = 0 then 'Failed'
     when item_name =  'Failed Trend Item' and r.date_number % 10 > 0 then 'Failed'
+    when item_name =  'Failed Trend Item' and r.date_number % 10 = 0 then 'Successful'
     when item_name =  'SuccesFailedsful Trend Item' and r.date_number % 10 = 0 then 'Successful'
     when item_name =  'Incomplete Intermittent Item' and r.date_number % 4 = 0 then 'Incomplete'
     when item_name =  'Incomplete Intermittent Item' and r.date_number % 4 > 0 then 'Successful'
