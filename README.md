@@ -26,6 +26,7 @@ This simple POC provides the ability to
 3. run the following in the terminal window:
    - streamlit run setup/streamlit/ItemHistory.py - to show data with Streamlit data_editor widget options
    - streamlit run setup/streamlit/ItemHistoryEmoji.py - to show data with data-driven emoji options
+   - streamlit run setup/streamlit/ItemHistoryScatter.py - to show data with a Plotly Scatter option
   
 # About the Author - Chris Schneider
 Chris specializes in helping organizations derive insights from their data ecosystems. Having spent spent many years honing his craft in Data Architecture, focusing on Microsoft and Snowflake products, Chris has transformed businesses with scalable data architectures, approachable processes, and a keen eye on data quality. Using expertise in Data Management and industry experience in Finance, Lending, and Healthcare, he has built metadata-driven frameworks and data warehouses, and ensured that users leverage the appropriate tools to drive success.
