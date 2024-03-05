@@ -1,0 +1,38 @@
+
+/*Load sample Queries for metrics*/
+merge into item_poc.history.query t
+using (
+    select subject,name,data_function
+    from (
+        values
+        ('model','modelCountbyDay','select count(1) as value,ceil(datediff(second,x.execution_timestamp::timestamp, current_timestamp()) / 86400) as historical_days from item_poc.history.item_type_history x where x.execution_timestamp >= dateadd(day, 180 * -1, current_timestamp()) and x.item_type = ''model'' group by 2')
+        ,('entity','entityCountbyDay','select count(1) as value,ceil(datediff(second,x.execution_timestamp::timestamp, current_timestamp()) / 86400) as historical_days from item_poc.history.item_type_history x where x.execution_timestamp >= dateadd(day, 180 * -1, current_timestamp()) and x.item_type = ''entity'' group by 2')
+        ,('attribute','attributeCountbyDay','select count(1) as value,ceil(datediff(second,x.execution_timestamp::timestamp, current_timestamp()) / 86400) as historical_days from item_poc.history.item_type_history x where x.execution_timestamp >= dateadd(day, 180 * -1, current_timestamp()) and x.item_type = ''attribute'' group by 2')
+        ,('relationship','relationshipCountbyDay','select count(1) as value,ceil(datediff(second,x.execution_timestamp::timestamp, current_timestamp()) / 86400) as historical_days from item_poc.history.item_type_history x where x.execution_timestamp >= dateadd(day, 180 * -1, current_timestamp()) and x.item_type = ''relationship'' group by 2')
+        ,('rule','ruleCountbyDay','select count(1) as value,ceil(datediff(second,x.execution_timestamp::timestamp, current_timestamp()) / 86400) as historical_days from item_poc.history.item_type_history x where x.execution_timestamp >= dateadd(day, 180 * -1, current_timestamp()) and x.item_type = ''rule'' group by 2')
+    
+        ,('model','modelSuccessCountbyDay','select count(1) as value,ceil(datediff(second,x.execution_timestamp::timestamp, current_timestamp()) / 86400) as historical_days from item_poc.history.item_type_history x where x.execution_timestamp >= dateadd(day, 180 * -1, current_timestamp()) and x.item_type = ''model'' and x.execution_status = ''Successful'' group by 2')
+        ,('entity','entitySuccessCountbyDay','select count(1) as value,ceil(datediff(second,x.execution_timestamp::timestamp, current_timestamp()) / 86400) as historical_days from item_poc.history.item_type_history x where x.execution_timestamp >= dateadd(day, 180 * -1, current_timestamp()) and x.item_type = ''entity'' and x.execution_status = ''Successful'' group by 2')
+        ,('attribute','attributeSuccessCountbyDay','select count(1) as value,ceil(datediff(second,x.execution_timestamp::timestamp, current_timestamp()) / 86400) as historical_days from item_poc.history.item_type_history x where x.execution_timestamp >= dateadd(day, 180 * -1, current_timestamp()) and x.item_type = ''attribute'' and x.execution_status = ''Successful'' group by 2')
+        ,('relationship','relationshipSuccessCountbyDay','select count(1) as value,ceil(datediff(second,x.execution_timestamp::timestamp, current_timestamp()) / 86400) as historical_days from item_poc.history.item_type_history x where x.execution_timestamp >= dateadd(day, 180 * -1, current_timestamp()) and x.item_type = ''relationship'' and x.execution_status = ''Successful'' group by 2')
+        ,('rule','ruleSuccessCountbyDay','select count(1) as value,ceil(datediff(second,x.execution_timestamp::timestamp, current_timestamp()) / 86400) as historical_days from item_poc.history.item_type_history x where x.execution_timestamp >= dateadd(day, 180 * -1, current_timestamp()) and x.item_type = ''rule'' and x.execution_status = ''Successful'' group by 2')
+    
+        ,('model','modelFailCountbyDay','select count(1) as value,ceil(datediff(second,x.execution_timestamp::timestamp, current_timestamp()) / 86400) as historical_days from item_poc.history.item_type_history x where x.execution_timestamp >= dateadd(day, 180 * -1, current_timestamp()) and x.item_type = ''model'' and x.execution_status = ''Failed'' group by 2')
+        ,('entity','entityFailCountbyDay','select count(1) as value,ceil(datediff(second,x.execution_timestamp::timestamp, current_timestamp()) / 86400) as historical_days from item_poc.history.item_type_history x where x.execution_timestamp >= dateadd(day, 180 * -1, current_timestamp()) and x.item_type = ''entity'' and x.execution_status = ''Failed'' group by 2')
+        ,('attribute','attributeFailCountbyDay','select count(1) as value,ceil(datediff(second,x.execution_timestamp::timestamp, current_timestamp()) / 86400) as historical_days from item_poc.history.item_type_history x where x.execution_timestamp >= dateadd(day, 180 * -1, current_timestamp()) and x.item_type = ''attribute'' and x.execution_status = ''Failed'' group by 2')
+        ,('relationship','relationshipFailCountbyDay','select count(1) as value,ceil(datediff(second,x.execution_timestamp::timestamp, current_timestamp()) / 86400) as historical_days from item_poc.history.item_type_history x where x.execution_timestamp >= dateadd(day, 180 * -1, current_timestamp()) and x.item_type = ''relationship'' and x.execution_status = ''Failed'' group by 2')
+        ,('rule','ruleFailCountbyDay','select count(1) as value,ceil(datediff(second,x.execution_timestamp::timestamp, current_timestamp()) / 86400) as historical_days from item_poc.history.item_type_history x where x.execution_timestamp >= dateadd(day, 180 * -1, current_timestamp()) and x.item_type = ''rule'' and x.execution_status = ''Failed'' group by 2')
+        
+        ,('model','modelIncompleteCountbyDay','select count(1) as value,ceil(datediff(second,x.execution_timestamp::timestamp, current_timestamp()) / 86400) as historical_days from item_poc.history.item_type_history x where x.execution_timestamp >= dateadd(day, 180 * -1, current_timestamp()) and x.item_type = ''model'' and x.execution_status = ''Incomplete'' group by 2')
+        ,('entity','entityIncompleteCountbyDay','select count(1) as value,ceil(datediff(second,x.execution_timestamp::timestamp, current_timestamp()) / 86400) as historical_days from item_poc.history.item_type_history x where x.execution_timestamp >= dateadd(day, 180 * -1, current_timestamp()) and x.item_type = ''entity'' and x.execution_status = ''Incomplete'' group by 2')
+        ,('attribute','attributeIncompleteCountbyDay','select count(1) as value,ceil(datediff(second,x.execution_timestamp::timestamp, current_timestamp()) / 86400) as historical_days from item_poc.history.item_type_history x where x.execution_timestamp >= dateadd(day, 180 * -1, current_timestamp()) and x.item_type = ''attribute'' and x.execution_status = ''Incomplete'' group by 2')
+        ,('relationship','relationshipIncompleteCountbyDay','select count(1) as value,ceil(datediff(second,x.execution_timestamp::timestamp, current_timestamp()) / 86400) as historical_days from item_poc.history.item_type_history x where x.execution_timestamp >= dateadd(day, 180 * -1, current_timestamp()) and x.item_type = ''relationship'' and x.execution_status = ''Incomplete'' group by 2')
+        ,('rule','ruleIncompleteCountbyDay','select count(1) as value,ceil(datediff(second,x.execution_timestamp::timestamp, current_timestamp()) / 86400) as historical_days from item_poc.history.item_type_history x where x.execution_timestamp >= dateadd(day, 180 * -1, current_timestamp()) and x.item_type = ''rule'' and x.execution_status = ''Incomplete'' group by 2')
+    
+    ) x (subject,name,data_function)
+) s 
+on s.subject = t.subject and s.name = t.name
+when matched then update set t.data_function = s.data_function
+when not matched then insert (subject,name,data_function) values (s.subject,s.name,s.data_function)
+;    
+

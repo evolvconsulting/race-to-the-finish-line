@@ -1,32 +1,44 @@
 
 # Introduction
-It may be challenging to present larger volumes of history in a succinct way that easily makes a point for the user.  Example: continually processing tasks or other automated processes that you would like to review.  In a situation when you have hundreds or more iterations of these items, to keep the user’s attention the output must be quick, short, and to the point.  Rather than having one scroll through line over line over line to understand historical trends, it makes more sense to provide a quick window into the previous iterations.  Presenting the information summarized to high may also create challenges trying to understand idiosyncrasies or inter relations within the continuous executions.   
+Imagine that each time a user came up with a new measurement to report on, they had to wait days or even weeks for an SDLC to run the requirement through its paces before being able to see the metric in their dashboard.  This project introduces a simple but effective solution improving speed to market with your application by introducing a data-driven approach and framework to adding metrics to your dashboard.  
 
 This simple POC provides the ability to 
 1. Setup a quick database with some sample data
-2. Show what the base Streamlit data_editor widget can present the data
-3. Show how using emojis instead can improve the user experience
+2. Show how to quickly add new metrics without having to redeploy the app
 
 # Setup
-1. Login to your snowflake account and run the 2 files in the setup/data folder.
-   - item_hisotry.sql
-   - emoji_content.sql
-2. Create a settings.env file in the setup folder to store local env settings for your env so the app can log into your Snowflake account.
+1. Login to your snowflake account and run the the sql files from the setup/data/shcema folder to create the sample data tables. 
+   - 1_item_type_history.sql - setup table to store historical run of items by various types
+   - 3_metric.sql - setup table to store metrics and configurations used in the app by Streamlit
+   - 5_query.sql - setup table to store queries to be referenced by metrics providing a simple output contract of: 
+      - Value (int)
+      - Historical_Days (int)
+   - 7_metric_query.sql - setup table to store associations of metrics and their related queries
+   - 9_metric_all.sql - create a view to bring all of this data together for the Streamlit app
+
+1. Then run the sql files from the setup/data/seed folder to load the sample application data.
+   
+   - setup/data/schema/
+      - 2_load_item_type_data.sql - load sample items and execution history
+      - 4_load_metric_data.sql - load sample metrics
+      - 6_load_query_data.sql - load sample queries
+      - 8_load_metric_query_data.sql = load sample metric-query relationships
+
+1. Create a settings.env file in the setup folder to store local env settings for your env so the app can log into your Snowflake account.
    - If you don't already have environment variables setup, add the following variables to this file and they will be established at runtime
-     - emoji_env=local
-     - emoji_snowflake_authenticator="externalbrowser if using SSO or None"
-     - emoji_snowflake_user="your snowflake user name"
-     - emoji_snowflake_pwd="your snowflake password or None if using SSO"
-     - emoji_snowflake_account="your snowflake account"
-     - emoji_snowflake_role="your snowflake role"
-     - emoji_snowflake_warehouse="your snowflake warehouse"
-     - emoji_snowflake_database=item_poc
-     - emoji_snowflake_schema=history
+     - snowflake_env=local
+     - snowflake_authenticator="externalbrowser if using SSO or None"
+     - snowflake_user="your snowflake user name"
+     - snowflake_pwd="your snowflake password or None if using SSO"
+     - snowflake_account="your snowflake account"
+     - snowflake_role="your snowflake role"
+     - snowflake_warehouse="your snowflake warehouse"
+     - snowflake_database=item_poc
+     - snowflake_schema=history
    - Alternatively, you can set these env variables up manually in your local env for testing
-3. run the following in the terminal window:
-   - streamlit run setup/streamlit/ItemHistory.py - to show data with Streamlit data_editor widget options
-   - streamlit run setup/streamlit/ItemHistoryEmoji.py - to show data with data-driven emoji options
-   - streamlit run setup/streamlit/ItemHistoryScatter.py - to show data with a Plotly Scatter option
+1. run the following in the terminal window:
+   - streamlit run setup/streamlit/Home.py - Click on Data Driven Metrics to show metric loading metrics from data objects stored in the database
   
 # About the Author - Chris Schneider
 Chris specializes in helping organizations derive insights from their data ecosystems. Having spent spent many years honing his craft in Data Architecture, focusing on Microsoft and Snowflake products, Chris has transformed businesses with scalable data architectures, approachable processes, and a keen eye on data quality. Using expertise in Data Management and industry experience in Finance, Lending, and Healthcare, he has built metadata-driven frameworks and data warehouses, and ensured that users leverage the appropriate tools to drive success.
+

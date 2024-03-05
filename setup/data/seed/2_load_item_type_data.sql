@@ -1,24 +1,6 @@
-/*Create sample database for POC data*/
-create database if not exists item_poc;
-
-/*Create sample schema for POC data*/
-create schema if not exists history;
-
-/*Create sample table for POC data*/
-create or replace table item_poc.history.item_history copy grants (
-item_history_id integer autoincrement(1,1) 
-,item_name varchar
-,execution_timestamp timestamp_ltz
-,execution_status varchar
-);
-
-/*Grant access to objects for POC data*/
-grant usage on database item_poc to role native_app_demo;
-grant usage on schema item_poc.history to role native_app_demo;
-grant insert,select on table item_poc.history.item_history to role native_app_demo;
 
 /*Load sample data with output for all dates for the last year to establish timeline within sample POC data*/
-insert into item_poc.history.item_history (item_name,execution_timestamp,execution_status)
+insert into item_poc.history.item_type_history (item_name,item_type,execution_timestamp,execution_status)
 with last_year as (
     select 
     dateadd(year,-1,current_timestamp()) as start_execution_timestamp
@@ -45,8 +27,21 @@ with last_year as (
     ,row_number() over(order by execution_timestamp) as date_number
     from each
 )
-, items as (
-    select item_name
+, item_types as (
+    select 
+    item_type
+    from (
+        values
+        ('model')
+        ,('entity')
+        ,('attribute')
+        ,('relationship')
+        ,('rule')
+        ) x (item_type)
+)
+, base_items as (
+    select 
+    item_name
     from (
         values
         ('Failed Item')
@@ -61,8 +56,16 @@ with last_year as (
         ,('Successful Intermittent Item')
         ) x (item_name)
 )
+, all_items as (
+    select 
+    i.item_name
+    ,t.item_type
+    from base_items i
+    join item_types t
+)
 select 
 i.item_name
+,i.item_type
 ,r.execution_timestamp
 ,case 
     when item_name = 'Failed Item' then 'Failed'
@@ -87,6 +90,6 @@ i.item_name
     when item_name =  'Successful Intermittent Item' and r.date_number % 1 = 0 then 'Failed'
     else 'Unknown'
 end as execution_status
-from items i
+from all_items i
 join each_row r
 ;

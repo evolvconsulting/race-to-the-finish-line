@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import os
+import components.common as common
 import snowflake.connector
 from snowflake.snowpark.context import get_active_session
 from snowflake.snowpark import Session
@@ -14,24 +15,24 @@ def get_snow_session() -> Session:
     # if no local env variable exists, assume running from Native App and leverage existing active session
     # else use local env variables to connect:
     # Create the following env variables for your environment in a settings.env file in the setup folder of the project once downloaded
-    if os.getenv('emoji_env') == 'local':
+    if os.getenv('snowflake_env') == 'local':
         print('is not Snowflake')
 
         # setup appropriate arguments depending on the options provided
         ckwargs = {
-            'user':os.getenv('emoji_snowflake_user')
-            ,'account':os.getenv('emoji_snowflake_account') 
-            ,'role':os.getenv('emoji_snowflake_role')
-            ,'warehouse':os.getenv('emoji_snowflake_warehouse')            
-            ,'database':os.getenv('emoji_snowflake_database')
-            ,'schema':os.getenv('emoji_snowflake_schema')
+            'user':os.getenv('snowflake_user')
+            ,'account':os.getenv('snowflake_account') 
+            ,'role':os.getenv('snowflake_role')
+            ,'warehouse':os.getenv('snowflake_warehouse')            
+            ,'database':os.getenv('snowflake_database')
+            ,'schema':os.getenv('snowflake_schema')
             }
         
         # add authenticator if setup to use SSO or use specified password
-        if os.getenv('emoji_snowflake_authenticator') == 'externalbrowser':
-            ckwargs['authenticator'] = os.getenv('emoji_snowflake_authenticator')
+        if os.getenv('snowflake_authenticator') == 'externalbrowser':
+            ckwargs['authenticator'] = os.getenv('snowflake_authenticator')
         else:
-            ckwargs['password'] = os.getenv('emoji_snowflake_pwd')
+            ckwargs['password'] = os.getenv('snowflake_pwd')
         
         # setup snowflake connector
         conn = snowflake.connector.connect(**ckwargs)
@@ -46,107 +47,55 @@ def get_snow_session() -> Session:
     
     return result
 
+@st.cache_data(show_spinner=False)
 def get_dataFromQuery(query) -> pd.DataFrame:
+    #run the supplied query and keep on streamlit cache as a resource
+    #retrieve with snowflake session and return as pandas
     try:
         query_main_df = get_snow_session().sql(query)
         pandas_main_df = query_main_df.to_pandas()
         return pandas_main_df
     except Exception as err:
-        st.error(f'''Error occurred while trying to connect to Snowflake:  {str(err)}''',icon='🚨')
 
+        common.display_error(f'Error occurred while trying to query the database.',err)
 
-def get_progressHistory(historyLimit:int) -> str:
-    return f'''
-        with last_items as (
-            select 
-            ih.item_name
-            ,ih.execution_status
-            from item_poc.history.item_history ih
-            qualify (row_number() over(partition by item_name order by ih.execution_timestamp desc)) <= {historyLimit}
-        )
-        select 
-        lt.item_name
-        ,sum(case when execution_status = 'Successful' then 1 else 0 end) / {historyLimit} as results
-        from last_items lt
-        group by lt.item_name
-        order by lt.item_name
+def get_metricActiveConfig() -> str:
+    #provided the base query to read the metrics that are defined in the data
+    return f"""
+        select
+        b.metric_id
+        ,b.subject
+        ,b.name 
+        ,b.metric_type
+        ,b.label
+        ,b.help_text
+        ,b.trend_normal
+        ,b.output_format
+        ,b.data_function1
+        ,b.data_function2
+        from item_poc.history.metric_all_active b
         ;
-        '''
+        """
 
-def get_lineHistory(historyLimit:int) -> str:
-    return f'''
-        with last_items as (
-            select 
-            ih.item_name
-            ,ih.execution_status
-            from item_poc.history.item_history ih
-            qualify (row_number() over(partition by item_name order by ih.execution_timestamp desc)) <= {historyLimit}
-        )
-        select 
-        lt.item_name
-        ,listagg(case when execution_status = 'Successful' then 1 else 0 end,', ') as results
-        from last_items lt
-        group by lt.item_name
-        order by lt.item_name
-        ;
-        '''
+@st.cache_data(show_spinner=False)
+def get_formatTranslation(value=None):
+    snowflake_dict = {
+            'Decimal 0': ',.0f'
+            ,'Decimal 2': ',.2f'
+            ,'Percentage 0': ',.0%'
+            ,'Percentage 2': ',.2%'
+            }
+    if value is not None:
+        result = snowflake_dict.get(value)
+    else:
+        result = snowflake_dict
 
-def get_graphHistory(historyLimit:int) -> str:
-    return f'''
-        with last_items as (
-            select 
-            ih.item_name
-            ,ih.execution_timestamp::date as execution_date
-            ,ih.execution_status
-            from item_poc.history.item_history ih
-            qualify (row_number() over(partition by item_name order by ih.execution_timestamp desc)) <= {historyLimit}
-        )
-        select 
-        lt.item_name
-        ,lt.execution_date
-        ,lt.execution_status
-        ,count(1) as item_count
-        from last_items lt
-        group by 1,2,3
-        ;
-        '''
+    return result
 
-def get_emojiHistory(emojiGroup:str,historyLimit:int) -> str:
-    return f'''
-        with last_items as (
-            select 
-            ih.item_name
-            ,ih.execution_status
-            from item_poc.history.item_history ih
-            qualify (row_number() over(partition by item_name order by ih.execution_timestamp desc)) <= {historyLimit}
-        )
-        select 
-        lt.item_name
-        ,listagg(es.emoji_content) as results
-        from last_items lt 
-        join item_poc.history.execution_status es
-            on lt.execution_status = es.execution_status
-            and es.emoji_group = '{emojiGroup}'
-        group by lt.item_name
-        order by lt.item_name
-        ;
-        '''
-def get_itemList(emojiGroup:str,historyLimit:int) -> str:
-    return f'''
-        select distinct
-        ih.item_name
-        from item_poc.history.item_history ih
-        ;
-        '''
+def get_metricTypes():
+    result = ['sum','rate']
+    return result
 
-def get_colorMap(color=None):
-    #add exec status colors
-    colormap_df = pd.DataFrame({
-            'COLOR_GROUP': ['EXECUTION_STATUS','EXECUTION_STATUS','EXECUTION_STATUS']
-            ,'COLOR_SEGMENT': ['Failed','Successful','Incomplete']
-            ,'COLOR_VALUE': ['rgb(255,0,0)','rgb(0,128,0)','rgb(255,255,0)']
-            }) 
-    
-    results=colormap_df[colormap_df['COLOR_GROUP'] == color].set_index(['COLOR_SEGMENT'])[['COLOR_VALUE']].to_dict()['COLOR_VALUE']
-
-    return results
+def get_metricSubjects():
+    result = ['query','task']
+    return result
