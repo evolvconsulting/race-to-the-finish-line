@@ -16,8 +16,7 @@ This simple POC provides the ability to
    - 7_metric_query.sql - setup table to store associations of metrics and their related queries
    - 9_metric_all.sql - create a view to bring all of this data together for the Streamlit app
 
-1. Then run the sql files from the setup/data/seed folder to load the sample application data.
-   
+1. Then run the sql files from the setup/data/seed folder to load the sample application data.   
    - setup/data/schema/
       - 2_load_item_type_data.sql - load sample items and execution history
       - 4_load_metric_data.sql - load sample metrics
